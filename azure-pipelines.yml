@@ -25,8 +25,8 @@ jobs:
   - bash: |
       set -ex
 
-      az version
-      az extension add -n ml
+      az version --debug
+      az extension add -n ml --debug
     displayName: 'Add AzureML Extension'
 
   - task: AzureCLI@2
