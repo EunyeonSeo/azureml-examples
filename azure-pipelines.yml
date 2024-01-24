@@ -25,7 +25,7 @@ jobs:
       set -ex
 
       az version
-      az extension add -n ml
+      az extension add -n azure-cli-ml
     displayName: 'Add AzureML Extension'
 
   - task: AzureCLI@2
