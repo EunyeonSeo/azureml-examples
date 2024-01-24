@@ -8,6 +8,7 @@ variables:
   resource-group: 'Ellie-DnAI' # replace with your resource group name
   workspace: 'ellie-aml-auseast' # replace with your workspace name
 
+
 jobs:
 - job: SubmitAzureMLJob
   displayName: Submit AzureML Job
@@ -44,6 +45,13 @@ jobs:
         # Set output variable for next task
         echo "##vso[task.setvariable variable=JOB_NAME;isOutput=true;]$job_name"
 
+  - task: AzureMLJobWaitTask@1
+    inputs:
+      serviceConnection: 'machine-learning-connection'
+      resourceGroupName: 'Ellie-DnAI'
+      azureMLWorkspaceName: 'ellie-aml-auseast'
+      azureMLJobName: '2da5772a-23f7-4454-a3b1-39572fc27500'
+      
 - job: WaitForAzureMLJobCompletion
   displayName: Wait for AzureML Job Completion
   pool: server
