@@ -22,6 +22,12 @@ jobs:
     inputs:
       versionSpec: '>=3.8'
 
+  - bash: |
+      set -ex
+
+      az version
+      az extension add -n ml
+    displayName: 'Add AzureML Extension'
 
   - task: AzureCLI@2
     name: submit_azureml_job_task
