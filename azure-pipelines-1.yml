@@ -59,7 +59,7 @@ stages:
     - SubmitAzureMLJob
     variables:
     - name: azureml_job_name_from_submit_job
-      value: $[ dependencies.SubmitAzureMLJob.outputs['submit_azureml_job_task.AZUREML_JOB_NAME'] ]
+      value: $[ dependencies.SubmitAzureMLJob.outputs['submit_azureml_job_task.job_name'] ]
     steps:
     - task: AzureMLJobWaitTask@1
       inputs:
