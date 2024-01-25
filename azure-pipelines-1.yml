@@ -18,10 +18,7 @@ stages:
     pool:
       vmImage: ubuntu-latest
     steps:
-    - task: 6d15af64-176c-496d-b583-fd2ae21d4df4@1
-      condition: false
-      inputs:
-        repository: none
+
     - task: UsePythonVersion@0
       displayName: Use Python >=3.8
       inputs:
