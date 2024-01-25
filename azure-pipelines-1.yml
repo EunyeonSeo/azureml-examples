@@ -1,0 +1,70 @@
+name: submit-azure-machine-learning-job
+trigger:
+  branches:
+    include:
+    - none
+
+variables:
+  service-connection: 'machine-learning-connection' # replace with your service connection name
+  resource-group: 'Ellie-DnAI' # replace with your resource group name
+  workspace: 'ellie-aml-auseast' # replace with your workspace name
+
+stages:
+- stage: __default
+  jobs:
+  - job: SubmitAzureMLJob
+    displayName: Submit AzureML Job
+    timeoutInMinutes: 300
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: 6d15af64-176c-496d-b583-fd2ae21d4df4@1
+      condition: false
+      inputs:
+        repository: none
+    - task: UsePythonVersion@0
+      displayName: Use Python >=3.8
+      inputs:
+        versionSpec: '>=3.8'
+    - task: Bash@3
+      displayName: 'Add AzureML Extension'
+      inputs:
+        targetType: inline
+        script: |
+          set -ex
+
+          az version
+          az extension add -n ml
+    - task: AzureCLI@2
+      name: submit_azureml_job_task
+      displayName: Submit AzureML Job Task
+      inputs:
+        azureSubscription: $(service-connection)
+        workingDirectory: 'cli/jobs/pipelines-with-components/nyc_taxi_data_regression'
+        scriptLocation: inlineScript
+        scriptType: bash
+        inlineScript: |2
+
+          # submit component job and get the run name
+          job_name=$(az ml job create --file single-job-pipeline.yml -g $(resource-group) -w $(workspace) --query name --output tsv)
+
+          # Set output variable for next task
+          echo "##vso[task.setvariable variable=JOB_NAME;isOutput=true;]$job_name"
+  - job: WaitForAzureMLJobCompletion
+    displayName: Wait for AzureML Job Completion
+    pool:
+      name: server
+    timeoutInMinutes: 0
+    dependsOn:
+    - SubmitAzureMLJob
+    variables:
+    - name: azureml_job_name_from_submit_job
+      value: $[ dependencies.SubmitAzureMLJob.outputs['submit_azureml_job_task.AZUREML_JOB_NAME'] ]
+    steps:
+    - task: AzureMLJobWaitTask@1
+      inputs:
+        serviceConnection: $(service-connection)
+        resourceGroupName: $(resource-group)
+        azureMLWorkspaceName: $(workspace)
+        azureMLJobName: $(azureml_job_name_from_submit_job)
+
