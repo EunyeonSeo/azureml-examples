@@ -1,7 +1,5 @@
 name: submit-azure-machine-learning-job
 
-trigger:
-- none
 
 variables:
   service-connection: 'machine-learning-connection' # replace with your service connection name
